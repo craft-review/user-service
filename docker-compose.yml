@@ -1,0 +1,34 @@
+version: '3.7'
+
+services:
+  user-service:
+    image: akhilja/user-service:0.0.1-SNAPSHOT
+    ports:
+      - "8080:8080"
+    restart: always
+    depends_on:
+      - mysql
+    environment:
+      RDS_HOSTNAME: mysql
+      RDS_PORT: 3306
+      RDS_DB_NAME: feedback_db
+      RDS_USERNAME: root
+      RDS_PASSWORD: password
+      DATABASE_URL: jdbc:mysql://mysql:3306/feedback_db
+      REDIS_HOSTNAME: redis
+
+  mysql:
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: feedback_db
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - mysql-database-data-volume:/var/lib/mysql
+
+volumes:
+  mysql-database-data-volume:

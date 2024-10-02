@@ -1,0 +1,106 @@
+buildscript {
+	ext {
+		jib_version = '3.2.1'
+		spring_boot_version = '2.5.1'
+		spring_dependency_management_version = '1.0.10.RELEASE'
+		sonar_qube_version = '2.7'
+	}
+}
+
+plugins {
+	id "java"
+	id "maven-publish"
+	id "io.spring.dependency-management" version "${spring_dependency_management_version}"
+	id "org.springframework.boot" version "${spring_boot_version}"
+	id "com.google.cloud.tools.jib" version "${jib_version}"
+	id "org.sonarqube" version "${sonar_qube_version}"
+	id "jacoco"
+}
+
+springBoot {
+	buildInfo()
+}
+
+jib {
+	to {
+		image = 'akhilja/user-service:0.0.1-RELEASE'
+		auth {
+			username = 'akhilja'
+			password = 'Sept2018!'
+		}
+	}
+}
+
+group = 'com.intuit'
+version = '0.0.1-RELEASE'
+sourceCompatibility = '11'
+
+repositories {
+	mavenCentral()
+	mavenLocal()
+}
+
+configurations {
+	all*.exclude module : 'spring-boot-starter-logging'
+}
+
+
+def flogger_version = '0.5.1'
+def junit_version = '5.5.1'
+def junit_mock_version = '3.2.0'
+
+dependencies {
+	/* gradle dependency for the flogger api. */
+	implementation "com.google.flogger:flogger:${flogger_version}"
+	implementation ("com.google.flogger:flogger-system-backend:${flogger_version}")
+	implementation ("com.google.flogger:flogger-slf4j-backend:${flogger_version}")
+
+	//  gradle dependency for the spring.
+	implementation "org.springframework.boot:spring-boot-starter-log4j2:${spring_boot_version}"
+	implementation "org.springframework.boot:spring-boot-starter-web-services:${spring_boot_version}"
+	implementation "org.springframework.boot:spring-boot-starter-actuator:${spring_boot_version}"
+
+	// lombok
+	compileOnly 'org.projectlombok:lombok:1.18.34'
+	annotationProcessor 'org.projectlombok:lombok:1.18.34'
+
+	testCompileOnly 'org.projectlombok:lombok:1.18.34'
+	testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
+
+	// sql
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'mysql:mysql-connector-java'
+
+	// Test
+	/* gradle dependency for the spring test. */
+	testImplementation "org.springframework.boot:spring-boot-starter-test:${spring_boot_version}"
+
+	// Junit-5
+	testImplementation "org.junit.jupiter:junit-jupiter-params:${junit_version}"
+	testImplementation "org.junit.jupiter:junit-jupiter-engine:${junit_version}"
+	testImplementation "org.junit.jupiter:junit-jupiter-api:${junit_version}"
+
+	// Mockito api
+	testImplementation "org.mockito:mockito-junit-jupiter:${junit_mock_version}"
+}
+
+tasks.withType(JavaCompile) {
+	options.encoding = "UTF-8"
+}
+
+test {
+	useJUnitPlatform {}
+	testLogging {
+		events 'PASSED', 'FAILED', 'SKIPPED'
+	}
+
+	afterSuite { desc, result ->
+		if (!desc.parent) {
+			println "\nTest result: ${result.resultType}"
+			println "Test summary: ${result.testCount} tests, " +
+					"${result.successfulTestCount} succeeded, " +
+					"${result.failedTestCount} failed, " +
+					"${result.skippedTestCount} skipped"
+		}
+	}
+}
