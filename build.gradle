@@ -23,7 +23,7 @@ springBoot {
 
 jib {
 	to {
-		image = 'akhilja/user-service:0.0.1-RELEASE'
+		image = 'akhilja/user-service:0.0.3-RELEASE'
 		auth {
 			username = 'akhilja'
 			password = 'Sept2018!'
@@ -70,6 +70,7 @@ dependencies {
 	// sql
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'mysql:mysql-connector-java'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
 	// Test
 	/* gradle dependency for the spring test. */

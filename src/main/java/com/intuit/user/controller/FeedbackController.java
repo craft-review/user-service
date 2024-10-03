@@ -1,60 +1,51 @@
 package com.intuit.user.controller;
 
-import com.intuit.user.model.Feedback;
-import com.intuit.user.repository.FeedbackRepository;
+import com.intuit.user.model.request.FeedbackRequestDTO;
+import com.intuit.user.model.response.FeedbackResponseDTO;
+import com.intuit.user.service.FeedbackService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Timestamp;
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/feedback")
+@Validated
 public class FeedbackController {
 
     @Autowired
-    private FeedbackRepository feedbackRepository;
+    private FeedbackService feedbackService;
 
     @PostMapping
-    public Feedback createFeedback(@RequestBody Feedback feedback) {
-        feedback.setCreatedTimestamp(new Timestamp(System.currentTimeMillis()));
-        feedback.setUpdatedTimestamp(new Timestamp(System.currentTimeMillis()));
-        return feedbackRepository.save(feedback);
+    public ResponseEntity<FeedbackResponseDTO> createFeedback(@Valid @RequestBody FeedbackRequestDTO feedbackRequestDTO) {
+        FeedbackResponseDTO createdFeedback = feedbackService.createFeedback(feedbackRequestDTO);
+        return ResponseEntity.ok(createdFeedback);
     }
 
     @GetMapping
-    public List<Feedback> getAllFeedbacks() {
-        return feedbackRepository.findAll();
+    public ResponseEntity<List<FeedbackResponseDTO>> getAllFeedbacks() {
+        List<FeedbackResponseDTO> feedbacks = feedbackService.getAllFeedbacks();
+        return ResponseEntity.ok(feedbacks);
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<List<Feedback>> getFeedbackByUserId(@PathVariable(value = "userId") String userId) {
-        List<Feedback> feedback = feedbackRepository.findByUserId(userId);
-        return ResponseEntity.ok(feedback);
+    public ResponseEntity<List<FeedbackResponseDTO>> getFeedbackByUserId(@PathVariable(value = "userId") String userId) {
+        List<FeedbackResponseDTO> feedbacks = feedbackService.getFeedbackByUserId(userId);
+        return ResponseEntity.ok(feedbacks);
     }
 
     @PutMapping("/{categoryId}/{userId}")
-    public ResponseEntity<Feedback> updateFeedback(@PathVariable String categoryId, @PathVariable String userId, @RequestBody Feedback feedbackDetails) {
-        Feedback feedback = feedbackRepository.findById(categoryId).orElseThrow();
-
-        if (feedbackDetails.getTransactionDescription() != null) {
-            feedback.setTransactionDescription(feedbackDetails.getTransactionDescription());
-        }
-        if (feedbackDetails.getPersonalisedCategory() != null) {
-            feedback.setPersonalisedCategory(feedbackDetails.getPersonalisedCategory());
-        }
-        if (feedbackDetails.getFeedbackCategory() != null) {
-            feedback.setFeedbackCategory(feedbackDetails.getFeedbackCategory());
-        }
-
-        final Feedback updatedFeedback = feedbackRepository.save(feedback);
+    public ResponseEntity<FeedbackResponseDTO> updateFeedback(@PathVariable Integer categoryId, @PathVariable String userId, @RequestBody FeedbackRequestDTO feedbackRequestDTO) {
+        FeedbackResponseDTO updatedFeedback = feedbackService.updateFeedback(categoryId, userId, feedbackRequestDTO);
         return ResponseEntity.ok(updatedFeedback);
     }
 
     @DeleteMapping("/{categoryId}")
-    public void deleteFeedback(@PathVariable String categoryId) {
-        feedbackRepository.deleteById(categoryId);
+    public ResponseEntity<Void> deleteFeedback(@PathVariable Integer categoryId) {
+        feedbackService.deleteFeedback(categoryId);
+        return ResponseEntity.noContent().build();
     }
 }
-

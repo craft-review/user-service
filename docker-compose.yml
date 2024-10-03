@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   user-service:
-    image: akhilja/user-service:0.0.1-SNAPSHOT
+    image: akhilja/user-service:0.0.3-RELEASE
     ports:
       - "8080:8080"
     restart: always
@@ -15,10 +15,14 @@ services:
       RDS_USERNAME: root
       RDS_PASSWORD: password
       DATABASE_URL: jdbc:mysql://mysql:3306/feedback_db
-      REDIS_HOSTNAME: redis
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/feedback_db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+  #      SPRING_DATASOURCE_DRIVER-CLASS-NAME: com.mysql.cj.jdbc.Driver
 
   mysql:
-    image: mysql:5.7
+    image: mysql:8.0
     ports:
       - "3306:3306"
     restart: always

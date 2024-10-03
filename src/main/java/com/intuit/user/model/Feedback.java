@@ -12,7 +12,8 @@ public class Feedback {
 
     @Id
     @Column(name = "category_id")
-    private String categoryId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int categoryId;
 
     @Column(name = "user_id")
     private String userId;
@@ -36,4 +37,24 @@ public class Feedback {
     private Timestamp updatedTimestamp;
 }
 
+/*
+create database feedback_db;
+
+use feedback_db;
+
+CREATE TABLE user_feedback (
+  category_id VARCHAR(255),
+  user_id VARCHAR(255),
+  transaction_id VARCHAR(255),
+  transaction_description TEXT,
+  personalised_category VARCHAR(255),
+  feedback_category VARCHAR(255),
+  created_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (category_id)
+);
+
+select * from user_feedback
+
+ */
 
